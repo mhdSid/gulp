@@ -59,6 +59,8 @@ Note: In the first phase the root folder is Development, and in the last phase t
  Index.html
 
  gulpFile.js
+ 
+ gulp.config.js
 
  package.json
 
