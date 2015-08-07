@@ -16,76 +16,49 @@ Sources to the files can be simply specified in the gulp.config.js
 The gulp file follows this App structure:
 
 App
+
   _public
+  
     Img
+    
     Styles
+    
       Less
+      
       Fonts
+      
   Component
+  
     Component.js
+    
     Component.html
+    
   Layout
+  
     directive.ts
+    
   Services
+  
     service.ts
+    
   Filters
+  
     filter.ts
+    
   App.ts
+  
   App.config.ts
+  
   App.routes.ts
+  
   MainCtrl.ts
+  
 Index.html
+
 gulpFile.js
+
 package.json
+
 bower.json
 
 
-Development
- app
-  _public
-    Img
-    Styles
-      Less
-      Fonts
-  Component
-    Component.js
-    Component.html
-  Layout
-    directive.ts
-  Services
-    service.ts
-  Filters
-    filter.ts
-  App.ts
-  App.config.ts
-  App.routes.ts
-  MainCtrl.ts
- Index.html
- gulpFile.js
- package.json
- bower.json
- 
-Build
- App
-  _public
-    Img
-    Styles
-      Less
-      Fonts
-  Component
-    Component.js
-    Component.html
-  Layout
-    directive.ts
-  Services
-    service.ts
-  Filters
-    filter.ts
-  App.ts
-  App.config.ts
-  App.routes.ts
-  MainCtrl.ts
- Index.html
- gulpFile.js
- package.json
- bower.json
