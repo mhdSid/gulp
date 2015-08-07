@@ -39,7 +39,11 @@ module.exports = function () {
 
 		index: "index.html",
 
-		templates: "build/app/templates.js"
+		templates: "build/app/templates.js",
+
+		watchTS: "app/**/*",
+
+		client: "/app"
 	};
 	return config;
 };

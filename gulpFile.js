@@ -2,20 +2,19 @@
 * * * Authored by Mohammad Sidani: mohdsidani@gmail.com
 */
 
-
 'use strict';
 
-var gulp = require('gulp');
-var runSequence = require('run-sequence');
-var wiredep = require('wiredep');
+var gulp = require("gulp");
+var runSequence = require("run-sequence");
+var wiredep = require("wiredep");
 var config = require("./gulp.config.js")();
 var lazy = require("gulp-load-plugins")({lazy: true});
-
+var del = require("del");
 
 /*
 * * * Compile Typescript  files
 */
-gulp.task('ts-compiler', function () {
+gulp.task("ts-compiler", function () {
   return gulp.src(config.allts)
     .pipe(lazy.typescript({
       // Generates corresponding .map file. 
@@ -56,7 +55,7 @@ gulp.task("dependency-fixer", function () {
 /*
 * * * LESS to CSS
 */
-gulp.task('less-css', function () {
+gulp.task("less-css", function () {
   return gulp.src(config.allless)
          .pipe(lazy.less())
          .pipe(gulp.dest(config.devDestCss));
@@ -66,7 +65,7 @@ gulp.task('less-css', function () {
 /*
 * * * Auto-Prefixer
 */
-gulp.task('auto-prefixer', function () {
+gulp.task("auto-prefixer", function () {
     return gulp.src(config.devMainCss)
            .pipe(lazy.autoprefixer({
                 browsers: ['last 2 versions'],
@@ -79,7 +78,7 @@ gulp.task('auto-prefixer', function () {
 /*
 * * * Minify Html
 */
-gulp.task('minify-html', function () {
+gulp.task("minify-html", function () {
     return gulp.src(config.allhtml)
            .pipe(lazy.minifyHtml({conditionals: true, spare:true}))
            .pipe(gulp.dest(config.buildDest));
@@ -112,7 +111,7 @@ gulp.task("minify-js", function () {
 /*
 * * * Inject all Bower components into index.html 
 */
-gulp.task('bower-injector', function () {
+gulp.task("bower-injector", function () {
     return gulp.src(config.index)
            .pipe(wiredep.stream())
            .pipe(gulp.dest(""));
@@ -122,10 +121,43 @@ gulp.task('bower-injector', function () {
 /*
 * * * Inject all JS into index.html
 */
-gulp.task('js-injector', function () {                                    
+gulp.task("js-injector", function () {                                    
     return gulp.src(config.index)
            .pipe(lazy.inject(gulp.src(config.alljs, {read: false})))
            .pipe(gulp.dest(""));
+});
+
+
+/*
+* * * Watches for new .ts files, compiles them, and then add them to index.html
+*/ 
+gulp.task("new-ts-watcher", function () {
+    lazy.watch(config.watchTS)
+        .on("add", function (name) {
+            var index = name.indexOf(config.client);
+            var filePath = name.substring(index);
+            var suffix = name.substring(name.length - 3);
+
+            console.log("New file has been added " + filePath);
+            if (suffix === ".ts") {
+              runSequence("ts-compiler", "js-injector");
+            }
+        })
+        .on("unlink", function (name) {
+            var index = name.indexOf(config.client);
+            var filePath = name.substring(index);
+            var suffix = name.substring(name.length - 3);
+
+            console.log("File has been deleted " + filePath);
+            if (suffix === ".ts") {
+              var jsPath = filePath.replace(".ts", ".js").replace("/app", "./development/app");
+              console.log(jsPath)
+              
+                del(jsPath, function () {
+                    gulp.start("js-injector");
+                });
+            }
+        });
 });
 
 
@@ -251,7 +283,8 @@ gulp.task("env-development", function () {
                 "js-injector", 
                 "css-injector",
                 "ts-watcher", 
-                "less-watcher");
+                "less-watcher",
+                "new-ts-watcher");
     setTimeout(function () {
             var assets = lazy.useref.assets();
             gulp.src(config.index)
