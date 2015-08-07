@@ -245,9 +245,7 @@ gulp.task("list-tasks", lazy.taskListing);
 */
 gulp.task("env-development", function () {
     runSequence("ts-compiler", 
-                //"js-builder", 
                 "less-css", 
-                //"css-builder", 
                 "auto-prefixer", 
                 "bower-injector", 
                 "js-injector", 
