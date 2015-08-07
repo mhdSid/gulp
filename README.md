@@ -32,7 +32,7 @@ Note: In the first phase the root folder is Development, and in the last phase t
       
   Component
   
-    Component.js
+    Component.ts
     
     Component.html
     
