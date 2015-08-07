@@ -1,3 +1,7 @@
+/*
+* * * Authored by Mohammad Sidani: mohdsidani@gmail.com
+*/
+
 'use strict';
 
 var gulp = require('gulp');
@@ -48,32 +52,12 @@ gulp.task("dependency-fixer", function () {
 
 
 /*
-* * * Concat, strip debug, annotate, and minify ng JS 
-*/  
-gulp.task('js-builder', ["dependency-fixer"], function () {
-  return gulp.src(config.alljs) 
-        .pipe(lazy.concat('build.js'))  
-        .pipe(gulp.dest(config.devDest));
-});
-
-
-/*
 * * * LESS to CSS
 */
 gulp.task('less-css', function () {
   return gulp.src(config.allless)
          .pipe(lazy.less())
          .pipe(gulp.dest(config.devDestCss));
-});
-
-
-/*
-* * * Minify, concat
-*/
-gulp.task('css-builder', function () {
-  return gulp.src(config.allcss) 
-        .pipe(lazy.concat('main.css'))
-        .pipe(gulp.dest(config.devDest));
 });
 
 
@@ -300,7 +284,3 @@ gulp.task("env-build", ["minify-html",
                 runSequence("minify-js", "minify-css", "dependency-fixer");
            });
 });
-
-
-
-
