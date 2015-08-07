@@ -1,29 +1,31 @@
 module.exports = function () {
 	var config = {
 
-		alljs: ["development/app/app.module.js", "development/app/app.*.js", "development/app/**/*.js"],
-
-		allts: ["app/app.*.ts", "app/**/*.ts"],
-
-		allless: "app/_public/styles/less/*.less",
-
 		allcss: "development/app/_public/styles/css/*.css",
+
+		allfonts: "app/_public/styles/fonts/*.*",
 
 		allhtml: "app/**/*.html",
 
 		allimg: "app/_public/img/*.*",
 
-		allfonts: "app/_public/styles/fonts/*.*",
+		alljs: ["development/app/app.module.js", "development/app/app.*.js", "development/app/**/*.js"],
 
-		buildDest: "build/app",
+		allless: "app/_public/styles/less/*.less",
 
-		buildCss: "build/app/main.css",
+		allts: ["app/app.*.ts", "app/**/*.ts"],
 
-		buildJs: "build/app/build.js",
+		browserSync: ["!app/_public/styles/less/*.less", "app/**/*.*"],
 
 		build: "build/",
 
-		browserSync: ["!app/_public/styles/less/*.less", "app/**/*.*"],
+		buildCss: "build/app/main.css",
+
+		buildDest: "build/app",
+
+		buildJs: "build/app/build.js",
+
+		dev: "development/",
 
 		devDest: "development/app",
 
@@ -31,13 +33,11 @@ module.exports = function () {
 
 		devMainCss: "development/app/main.css",
 
-		dev: "development/",
-
 		fontDest: "build/app/_public/styles/fonts",
 
-		index: "index.html",
-
 		imgDest: "build/app/_public/img",
+
+		index: "index.html",
 
 		templates: "build/app/templates.js"
 	};
