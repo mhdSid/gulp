@@ -149,13 +149,22 @@ gulp.task("new-ts-watcher", function () {
             var suffix = name.substring(name.length - 3);
 
             console.log("File has been deleted " + filePath);
+
             if (suffix === ".ts") {
               var jsPath = filePath.replace(".ts", ".js").replace("/app", "./development/app");
               console.log(jsPath)
               
-                del(jsPath, function () {
+              del(jsPath, function () {
+                  gulp.start("js-injector");
+              });
+            }
+            else if (suffix === ".js") {
+              var tsPath = filePath.replace(".js", ".ts").replace("/app", "./app");
+              console.log(jsPath)
+              
+              del(tsPath, function () {
                     gulp.start("js-injector");
-                });
+              });
             }
         });
 });

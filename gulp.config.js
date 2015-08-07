@@ -41,7 +41,7 @@ module.exports = function () {
 
 		templates: "build/app/templates.js",
 
-		watchTS: "app/**/*",
+		watchTS: ["app/**/*", "development/app/**/*"],
 
 		client: "/app"
 	};
