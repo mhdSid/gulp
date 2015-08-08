@@ -133,20 +133,20 @@ gulp.task("js-injector", function () {
 */ 
 gulp.task("new-ts-watcher", function () {
     lazy.watch(config.watchTS)
-        .on("add", function (name) {
-            var index = name.indexOf(config.client);
-            var filePath = name.substring(index);
-            var suffix = name.substring(name.length - 3);
+        .on("add", function (path) {
+            var index = path.indexOf(config.client);
+            var filePath = path.substring(index);
+            var suffix = path.substring(name.length - 3);
 
             console.log("New file has been added " + filePath);
             if (suffix === ".ts") {
               runSequence("ts-compiler", "js-injector");
             }
         })
-        .on("unlink", function (name) {
-            var index = name.indexOf(config.client);
-            var filePath = name.substring(index);
-            var suffix = name.substring(name.length - 3);
+        .on("unlink", function (path) {
+            var index = path.indexOf(config.client);
+            var filePath = path.substring(index);
+            var suffix = path.substring(name.length - 3);
 
             console.log("File has been deleted " + filePath);
 
