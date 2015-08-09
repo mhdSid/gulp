@@ -129,7 +129,7 @@ gulp.task("js-injector", function () {
 
 
 /*
-* * * Watches for new .ts files, compiles them, and then add them to index.html
+* * * Watches for new .ts files, compiles them, and then adds them to the index.html
 */ 
 gulp.task("new-ts-watcher", function () {
     lazy.watch(config.watchTS)
