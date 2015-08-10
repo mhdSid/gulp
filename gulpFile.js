@@ -181,31 +181,27 @@ gulp.task("css-injector", function () {
 
 
 /*
-* * * Watch for changes in typescript files, deletes the old build.js file, recompiles the files, and then merges them 
+* * * Watch for changes in typescript files, recompiles the files, and then merges them 
 * * * into one file using the useRef method
 */
 gulp.task('ts-watcher', function() {
     gulp.watch(config.allts, function () {
-      del(config.buildJs, function () {
         runSequence("ts-compiler", function () {
           useRefDev();
         });
-      });
     });
 });
 
 
 /*
-* * * Watch for changes in less files, deletes the old main.css file, converts from less to css, and then merges them
+* * * Watch for changes in less files, converts from less to css, and then merges them
 * * * into one file using the useRef method 
 */
 gulp.task('less-watcher', function() {
     gulp.watch(config.allless, function () {
-      del(config.buildCss, function () {
         runSequence("less-css", function () {
           useRefDev();
         });
-      });
     });
 });
 
