@@ -76,39 +76,6 @@ gulp.task("auto-prefixer", function () {
 
 
 /*
-* * * Minify Html
-*/
-gulp.task("minify-html", function () {
-    return gulp.src(config.allhtml)
-           .pipe(lazy.minifyHtml({conditionals: true, spare:true}))
-           .pipe(gulp.dest(config.buildDest));
-});
-
-
-/*
-* * * Minify Css
-*/
-gulp.task("minify-css", function () {
-    return gulp.src(config.buildCss)
-           .pipe(lazy.minifyCss({keepBreaks: false}))
-           .pipe(lazy.rename({suffix: '.optimized.min'}))
-           .pipe(gulp.dest(config.buildDest));
-});
-
-
-/*
-* * * Minify JS
-*/
-gulp.task("minify-js", function () {
-    return gulp.src(config.buildJs)
-           .pipe(lazy.stripDebug())
-           .pipe(lazy.uglify())
-           .pipe(lazy.rename({suffix: '.optimized.min'}))
-           .pipe(gulp.dest(config.buildDest));
-});
-
-
-/*
 * * * Inject all Bower components into index.html 
 */
 gulp.task("bower-injector", function () {
@@ -339,6 +306,39 @@ gulp.task("images", function () {
 gulp.task("fonts", function () {
     return gulp.src(config.allfonts)
                .pipe(gulp.dest(config.fontDest))
+});
+
+
+/*
+* * * Minify Html
+*/
+gulp.task("minify-html", function () {
+    return gulp.src(config.allhtml)
+           .pipe(lazy.minifyHtml({conditionals: true, spare:true}))
+           .pipe(gulp.dest(config.buildDest));
+});
+
+
+/*
+* * * Minify Css
+*/
+gulp.task("minify-css", function () {
+    return gulp.src(config.buildCss)
+           .pipe(lazy.minifyCss({keepBreaks: false}))
+           .pipe(lazy.rename({suffix: '.optimized.min'}))
+           .pipe(gulp.dest(config.buildDest));
+});
+
+
+/*
+* * * Minify JS
+*/
+gulp.task("minify-js", function () {
+    return gulp.src(config.buildJs)
+           .pipe(lazy.stripDebug())
+           .pipe(lazy.uglify())
+           .pipe(lazy.rename({suffix: '.optimized.min'}))
+           .pipe(gulp.dest(config.buildDest));
 });
 
 
