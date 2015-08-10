@@ -109,8 +109,8 @@ gulp.task("css-injector", function () {
 
 /*
 * * *  Watch for newly added Typescript files, compile them, and then added their Js files into index.html. 
-* * * If a file has been deleted, its corresponding Js or Ts will be deleted and its following script will be 
-* * * deleted from index.html
+* * * If a file has been deleted, its corresponding Js will be deleted and its following script will be 
+* * * also deleted from index.html
 */ 
 gulp.task("new-ts-watcher", function () {
     lazy.watch(config.watchTS)
@@ -140,8 +140,8 @@ gulp.task("new-ts-watcher", function () {
 
 /*
 * * * Watch for newly added Less files, compile them, and then added their Css files into index.html. 
-* * * If a file has been deleted, its corresponding Less or Css will be deleted and its following stylesheet 
-* * * will be deleted from index.html
+* * * If a file has been deleted, its corresponding Css will be deleted and its following stylesheet 
+* * * will be also deleted from index.html
 */ 
 gulp.task("new-less-watcher", function () {
     lazy.watch(config.watchLess)
@@ -371,7 +371,8 @@ gulp.task("env-development", function () {
                 "ts-watcher", 
                 "less-watcher",
                 "new-ts-watcher",
-                "new-less-watcher", useRefDev);
+                "new-less-watcher",
+                "browser-sync", useRefDev);
 });
 
 
