@@ -187,9 +187,12 @@ gulp.task("css-injector", function () {
 */
 gulp.task('ts-watcher', function() {
     gulp.watch(config.allts, function () {
-      del(config.buildJs);
-      gulp.start("ts-compiler");
-  });
+      del(config.buildJs, function () {
+        runSequence("ts-compiler", function () {
+          useRef("env-development");
+        });
+      });
+    });
 });
 
 
@@ -198,9 +201,12 @@ gulp.task('ts-watcher', function() {
 */
 gulp.task('less-watcher', function() {
     gulp.watch(config.allless, function () {
-      del(config.buildCss);
-      gulp.start("less-css");
-  });
+      del(config.buildCss, function () {
+        runSequence("less-css", function () {
+          useRef("env-development");
+        });
+      });
+    });
 });
 
 
@@ -242,6 +248,36 @@ function startBrowserSync() {
   });
 
   lazy.browserSync(options);
+}
+
+
+/*
+* * * Function that depends on the environment. It goes into the index.html and merges all .js files into build.js
+* * * and all .css files into main.css. IF the environment is the build environment, it injects the html partials in the
+* * * angular template cache before merging all the scripts together in one file.
+* * * 
+*/
+function useRef(env) {
+  var assets = lazy.useref.assets();
+  if (env === "env-development") {
+    gulp.src(config.index)
+      .pipe(lazy.plumber())
+      .pipe(assets)
+      .pipe(assets.restore())
+      .pipe(lazy.useref())
+      .pipe(gulp.dest(config.dev));
+  } else if (env === "env-build") {
+    gulp.src(config.index)
+        .pipe(lazy.plumber())
+        .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
+        .pipe(assets)
+        .pipe(assets.restore())
+        .pipe(lazy.useref())
+        .pipe(gulp.dest(config.build))
+        .on("end", function () {
+          runSequence("minify-js", "minify-css", "dependency-fixer");
+        });
+  }
 }
 
 
@@ -294,13 +330,7 @@ gulp.task("env-development", function () {
                 "ts-watcher", 
                 "less-watcher",
                 "new-ts-watcher", function () {
-                    var assets = lazy.useref.assets();
-                    gulp.src(config.index)
-                        .pipe(lazy.plumber())
-                        .pipe(assets)
-                        .pipe(assets.restore())
-                        .pipe(lazy.useref())
-                        .pipe(gulp.dest(config.dev));
+                    useRef("env-development");
                 });
 });
 
@@ -311,16 +341,5 @@ gulp.task("env-development", function () {
 gulp.task("env-build", ["minify-html", 
                         "images", 
                         "fonts", 
-                        "template-cache"], function () {
-                var assets = lazy.useref.assets();
-                return gulp.src(config.index)
-                           .pipe(lazy.plumber())
-                           .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
-                           .pipe(assets)
-                           .pipe(assets.restore())
-                           .pipe(lazy.useref())
-                           .pipe(gulp.dest(config.build))
-                           .on("end", function () {
-                              runSequence("minify-js", "minify-css", "dependency-fixer");
-           });
-});
+                        "template-cache"], useRef("env-build")
+);
