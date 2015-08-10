@@ -129,6 +129,16 @@ gulp.task("js-injector", function () {
 
 
 /*
+* * * Inject all CSS into index.html
+*/
+gulp.task("css-injector", function () {
+    return gulp.src(config.index)
+           .pipe(lazy.inject(gulp.src(config.allcss)))
+           .pipe(gulp.dest(""));
+});
+
+
+/*
 * * *  Watch for newly added Typescript files, compile them, and then added their Js files into index.html. 
 * * * If a file has been deleted, its corresponding Js or Ts will be deleted and its following script will be 
 * * * deleted from index.html
@@ -199,16 +209,6 @@ gulp.task("new-less-watcher", function () {
               });
             }
         });
-});
-
-
-/*
-* * * Inject all CSS into index.html
-*/
-gulp.task("css-injector", function () {
-    return gulp.src(config.index)
-           .pipe(lazy.inject(gulp.src(config.allcss)))
-           .pipe(gulp.dest(""));
 });
 
 
@@ -360,7 +360,8 @@ gulp.task("env-development", function () {
                 "css-injector",
                 "ts-watcher", 
                 "less-watcher",
-                "new-ts-watcher", function () {
+                "new-ts-watcher",
+                "new-less-watcher", function () {
                     useRefDev();
                 });
 });
