@@ -181,9 +181,8 @@ gulp.task("css-injector", function () {
 
 
 /*
-* * * Watch for changes in typescript files. Delete the old build file, compile the files, and then build the build.js
-* * * First Delete the already existing build file so the changes won't be added on top of the file. 
-* * * Any changes made to a file will cause the whole file to be added. So first we delete the old build file, then create a new one
+* * * Watch for changes in typescript files, deletes the old build.js file, recompiles the files, and then merges them 
+* * * into one file using the useRef method
 */
 gulp.task('ts-watcher', function() {
     gulp.watch(config.allts, function () {
@@ -197,7 +196,8 @@ gulp.task('ts-watcher', function() {
 
 
 /*
-* * * Watch for changes in less files. Convert from less to css, and then build the main.css
+* * * Watch for changes in less files, deletes the old main.css file, converts from less to css, and then merges them
+* * * into one file using the useRef method 
 */
 gulp.task('less-watcher', function() {
     gulp.watch(config.allless, function () {
