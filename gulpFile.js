@@ -311,17 +311,16 @@ gulp.task("env-development", function () {
 gulp.task("env-build", ["minify-html", 
                         "images", 
                         "fonts", 
-                        "template-cache"
-                        ], function () {
-    var assets = lazy.useref.assets();
-    return gulp.src(config.index)
-               .pipe(lazy.plumber())
-               .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
-               .pipe(assets)
-               .pipe(assets.restore())
-               .pipe(lazy.useref())
-               .pipe(gulp.dest(config.build))
-               .on("end", function () {
-                  runSequence("minify-js", "minify-css", "dependency-fixer");
+                        "template-cache"], function () {
+                var assets = lazy.useref.assets();
+                return gulp.src(config.index)
+                           .pipe(lazy.plumber())
+                           .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
+                           .pipe(assets)
+                           .pipe(assets.restore())
+                           .pipe(lazy.useref())
+                           .pipe(gulp.dest(config.build))
+                           .on("end", function () {
+                              runSequence("minify-js", "minify-css", "dependency-fixer");
            });
 });
