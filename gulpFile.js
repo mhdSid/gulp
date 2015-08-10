@@ -129,7 +129,9 @@ gulp.task("js-injector", function () {
 
 
 /*
-* * * Watches for new .ts files, compiles them, and then adds them to the index.html
+* * *  Watch for newly added Typescript files, compile them, and then added their Js files into index.html. 
+* * * If a file has been deleted, its corresponding Js or Ts will be deleted and its following script will be 
+* * * deleted from index.html
 */ 
 gulp.task("new-ts-watcher", function () {
     lazy.watch(config.watchTS)
@@ -137,7 +139,6 @@ gulp.task("new-ts-watcher", function () {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
             var suffix = path.substring(path.length - 3);
-
             console.log("New file has been added " + filePath);
             if (suffix === ".ts") {
               runSequence("ts-compiler", "js-injector");
@@ -147,23 +148,54 @@ gulp.task("new-ts-watcher", function () {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
             var suffix = path.substring(path.length - 3);
-
             console.log("File has been deleted " + filePath);
-
             if (suffix === ".ts") {
               var jsPath = filePath.replace(".ts", ".js").replace("/app", "./development/app");
-              console.log(jsPath)
-              
               del(jsPath, function () {
-                  gulp.start("js-injector");
+                gulp.start("js-injector");
               });
             }
             else if (suffix === ".js") {
-              var tsPath = filePath.replace(".js", ".ts").replace("/app", "./app");
-              console.log(jsPath)
-              
+              var tsPath = filePath.replace(".js", ".ts").replace("/app", "./app");              
               del(tsPath, function () {
-                    gulp.start("js-injector");
+                gulp.start("js-injector");
+              });
+            }
+        });
+});
+
+
+/*
+* * * Watch for newly added Less files, compile them, and then added their Css files into index.html. 
+* * * If a file has been deleted, its corresponding Less or Css will be deleted and its following stylesheet 
+* * * will be deleted from index.html
+*/ 
+gulp.task("new-less-watcher", function () {
+    lazy.watch(config.watchLess)
+        .on("add", function (path) {
+            var index = path.indexOf(config.client);
+            var filePath = path.substring(index);
+            var suffix = path.substring(path.lastIndexOf("."));
+            console.log("New file has been added " + filePath);
+            if (suffix === ".less") {
+              runSequence("less-css", "css-injector");
+            }
+        })
+        .on("unlink", function (path) {
+            var index = path.indexOf(config.client);
+            var filePath = path.substring(index);
+            var suffix = path.substring(path.lastIndexOf("."));
+            console.log("New file has been deleted " + filePath);
+            if (suffix === ".less") {
+              var cssPath = filePath.replace("less", "css").replace(".less", ".css").replace("/app", "./development/app");
+              del(cssPath, function () {
+                gulp.start("css-injector");
+              });
+            }
+            else if (suffix === ".css") {
+              var lessPath = filePath.replace("css", "less").replace(".css", ".less").replace("/app", "./app");
+              del(lessPath, function () {
+                gulp.start("css-injector");
               });
             }
         });
