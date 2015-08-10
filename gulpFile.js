@@ -242,7 +242,6 @@ function startBrowserSync() {
 function useRefDev () {
   var assets = lazy.useref.assets();
   gulp.src(config.index)
-      .pipe(lazy.plumber())
       .pipe(assets)
       .pipe(assets.restore())
       .pipe(lazy.useref())
@@ -257,7 +256,6 @@ function useRefDev () {
 function useRefBuild () {
   var assets = lazy.useref.assets();
   gulp.src(config.index)
-      .pipe(lazy.plumber())
       .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
       .pipe(assets)
       .pipe(assets.restore())
