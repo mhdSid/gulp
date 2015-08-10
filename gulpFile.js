@@ -136,7 +136,7 @@ gulp.task("new-ts-watcher", function () {
         .on("add", function (path) {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
-            var suffix = path.substring(name.length - 3);
+            var suffix = path.substring(path.length - 3);
 
             console.log("New file has been added " + filePath);
             if (suffix === ".ts") {
@@ -146,7 +146,7 @@ gulp.task("new-ts-watcher", function () {
         .on("unlink", function (path) {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
-            var suffix = path.substring(name.length - 3);
+            var suffix = path.substring(path.length - 3);
 
             console.log("File has been deleted " + filePath);
 
@@ -188,7 +188,7 @@ gulp.task("css-injector", function () {
 gulp.task('ts-watcher', function() {
     gulp.watch(config.allts, function () {
       del(config.buildJs);
-      runSequence("ts-compiler", "js-builder");
+      gulp.start("ts-compiler");
   });
 });
 
@@ -199,7 +199,7 @@ gulp.task('ts-watcher', function() {
 gulp.task('less-watcher', function() {
     gulp.watch(config.allless, function () {
       del(config.buildCss);
-      runSequence("less-css", "css-builder");
+      gulp.start("less-css");
   });
 });
 
@@ -250,9 +250,9 @@ function startBrowserSync() {
 */  
 gulp.task("template-cache", function () {
     return gulp.src(config.allhtml)
-           .pipe(lazy.minifyHtml({empty: true}))
-           .pipe(lazy.angularTemplatecache())
-           .pipe(gulp.dest(config.buildDest));
+               .pipe(lazy.minifyHtml({empty: true}))
+               .pipe(lazy.angularTemplatecache())
+               .pipe(gulp.dest(config.buildDest));
 });
 
 
@@ -261,8 +261,8 @@ gulp.task("template-cache", function () {
 */
 gulp.task("images", function () {
     return gulp.src(config.allimg)
-           .pipe(lazy.imagemin({optimizationLevel: 5}))
-           .pipe(gulp.dest(config.imgDest))
+               .pipe(lazy.imagemin({optimizationLevel: 5}))
+               .pipe(gulp.dest(config.imgDest))
 });
 
 
@@ -271,7 +271,7 @@ gulp.task("images", function () {
 */
 gulp.task("fonts", function () {
     return gulp.src(config.allfonts)
-           .pipe(gulp.dest(config.fontDest))
+               .pipe(gulp.dest(config.fontDest))
 });
 
 
@@ -293,16 +293,15 @@ gulp.task("env-development", function () {
                 "css-injector",
                 "ts-watcher", 
                 "less-watcher",
-                "new-ts-watcher");
-    setTimeout(function () {
-            var assets = lazy.useref.assets();
-            gulp.src(config.index)
-            .pipe(lazy.plumber())
-            .pipe(assets)
-            .pipe(assets.restore())
-            .pipe(lazy.useref())
-            .pipe(gulp.dest(config.dev));
-    }, 1000);
+                "new-ts-watcher", function () {
+                    var assets = lazy.useref.assets();
+                    gulp.src(config.index)
+                        .pipe(lazy.plumber())
+                        .pipe(assets)
+                        .pipe(assets.restore())
+                        .pipe(lazy.useref())
+                        .pipe(gulp.dest(config.dev));
+                });
 });
 
 
@@ -316,13 +315,13 @@ gulp.task("env-build", ["minify-html",
                         ], function () {
     var assets = lazy.useref.assets();
     return gulp.src(config.index)
-           .pipe(lazy.plumber())
-           .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
-           .pipe(assets)
-           .pipe(assets.restore())
-           .pipe(lazy.useref())
-           .pipe(gulp.dest(config.build))
-           .on("end", function () {
-                runSequence("minify-js", "minify-css", "dependency-fixer");
+               .pipe(lazy.plumber())
+               .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
+               .pipe(assets)
+               .pipe(assets.restore())
+               .pipe(lazy.useref())
+               .pipe(gulp.dest(config.build))
+               .on("end", function () {
+                  runSequence("minify-js", "minify-css", "dependency-fixer");
            });
 });
