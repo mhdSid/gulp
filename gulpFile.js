@@ -47,8 +47,8 @@ gulp.task("ts-compiler", function () {
 */    /*@ngInject*/
 gulp.task("dependency-fixer", function () {
   return gulp.src(config.alljs)
-          .pipe(lazy.ngAnnotate()) 
-          .pipe(gulp.dest(config.devDest));
+             .pipe(lazy.ngAnnotate()) 
+             .pipe(gulp.dest(config.devDest));
 });
 
 
@@ -57,8 +57,8 @@ gulp.task("dependency-fixer", function () {
 */
 gulp.task("less-css", function () {
   return gulp.src(config.allless)
-         .pipe(lazy.less())
-         .pipe(gulp.dest(config.devDestCss));
+             .pipe(lazy.less())
+             .pipe(gulp.dest(config.devDestCss));
 });
 
 
@@ -188,7 +188,7 @@ gulp.task('ts-watcher', function() {
     gulp.watch(config.allts, function () {
       del(config.buildJs, function () {
         runSequence("ts-compiler", function () {
-          useRef("env-development");
+          useRefDev();
         });
       });
     });
@@ -203,7 +203,7 @@ gulp.task('less-watcher', function() {
     gulp.watch(config.allless, function () {
       del(config.buildCss, function () {
         runSequence("less-css", function () {
-          useRef("env-development");
+          useRefDev();
         });
       });
     });
@@ -252,32 +252,35 @@ function startBrowserSync() {
 
 
 /*
-* * * Function that depends on the environment. It goes into the index.html and merges all .js files into build.js
-* * * and all .css files into main.css. IF the environment is the build environment, it injects the html partials in the
-* * * angular template cache before merging all the scripts together in one file.
-* * * 
+* * * It goes into the index.html. It merges all .js files into build.js and all .css files into main.css. 
 */
-function useRef(env) {
+function useRefDev () {
   var assets = lazy.useref.assets();
-  if (env === "env-development") {
-    gulp.src(config.index)
+  gulp.src(config.index)
       .pipe(lazy.plumber())
       .pipe(assets)
       .pipe(assets.restore())
       .pipe(lazy.useref())
       .pipe(gulp.dest(config.dev));
-  } else if (env === "env-build") {
-    gulp.src(config.index)
-        .pipe(lazy.plumber())
-        .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
-        .pipe(assets)
-        .pipe(assets.restore())
-        .pipe(lazy.useref())
-        .pipe(gulp.dest(config.build))
-        .on("end", function () {
+}
+
+
+/*
+* * * IF the environment is the build environment, it injects the html partials in the
+* * * angular template cache before merging all the scripts together in one file.
+*/
+function useRefBuild () {
+  var assets = lazy.useref.assets();
+  gulp.src(config.index)
+      .pipe(lazy.plumber())
+      .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
+      .pipe(assets)
+      .pipe(assets.restore())
+      .pipe(lazy.useref())
+      .pipe(gulp.dest(config.build))
+      .on("end", function () {
           runSequence("minify-js", "minify-css", "dependency-fixer");
-        });
-  }
+      });
 }
 
 
@@ -330,7 +333,7 @@ gulp.task("env-development", function () {
                 "ts-watcher", 
                 "less-watcher",
                 "new-ts-watcher", function () {
-                    useRef("env-development");
+                    useRefDev;
                 });
 });
 
@@ -341,5 +344,5 @@ gulp.task("env-development", function () {
 gulp.task("env-build", ["minify-html", 
                         "images", 
                         "fonts", 
-                        "template-cache"], useRef("env-build")
+                        "template-cache"], useRefBuild
 );
