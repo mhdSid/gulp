@@ -333,7 +333,7 @@ gulp.task("env-development", function () {
                 "ts-watcher", 
                 "less-watcher",
                 "new-ts-watcher", function () {
-                    useRefDev;
+                    useRefDev();
                 });
 });
 
@@ -344,5 +344,6 @@ gulp.task("env-development", function () {
 gulp.task("env-build", ["minify-html", 
                         "images", 
                         "fonts", 
-                        "template-cache"], useRefBuild
-);
+                        "template-cache"], function () {
+                            useRefBuild();
+});
