@@ -31,6 +31,8 @@ module.exports = function () {
 
 		buildTmpl: "build/app/templates.js",
 
+		client: "/app",
+
 		dev: "development/",
 
 		devDest: "development/app",
@@ -49,9 +51,7 @@ module.exports = function () {
 
 		watchTS: ["app/**/*", "development/app/**/*"],
 
-		watchLess: ["app/**/**/**", "development/app/**/**/**"],
-
-		client: "/app"
+		watchLess: ["app/**/**/**", "development/app/**/**/**"]	
 	};
 	return config;
 };

@@ -9,7 +9,9 @@ var runSequence = require("run-sequence");
 var wiredep = require("wiredep");
 var config = require("./gulp.config.js")();
 var lazy = require("gulp-load-plugins")({lazy: true});
-var del = require("del");
+var clean = require("del");
+var browserSync = require("browser-sync");
+
 
 /*
 * * * Compile Typescript  files
@@ -37,7 +39,7 @@ gulp.task("ts-compiler", function () {
  
       // Specify ECMAScript target version: 'ES3' (default), or 'ES5' 
       target : 'ES5'
-  }))
+    }))
     .pipe(gulp.dest(config.devDest));
 });
 
@@ -128,13 +130,7 @@ gulp.task("new-ts-watcher", function () {
             console.log("File has been deleted " + filePath);
             if (suffix === ".ts") {
               var jsPath = filePath.replace(".ts", ".js").replace("/app", "./development/app");
-              del(jsPath, function () {
-                gulp.start("js-injector");
-              });
-            }
-            else if (suffix === ".js") {
-              var tsPath = filePath.replace(".js", ".ts").replace("/app", "./app");              
-              del(tsPath, function () {
+              clean(jsPath, function () {
                 gulp.start("js-injector");
               });
             }
@@ -165,13 +161,7 @@ gulp.task("new-less-watcher", function () {
             console.log("New file has been deleted " + filePath);
             if (suffix === ".less") {
               var cssPath = filePath.replace("less", "css").replace(".less", ".css").replace("/app", "./development/app");
-              del(cssPath, function () {
-                gulp.start("css-injector");
-              });
-            }
-            else if (suffix === ".css") {
-              var lessPath = filePath.replace("css", "less").replace(".css", ".less").replace("/app", "./app");
-              del(lessPath, function () {
+              clean(cssPath, function () {
                 gulp.start("css-injector");
               });
             }
@@ -234,15 +224,15 @@ function startBrowserSync() {
       browser: "safari"
   };
 
-  if (lazy.browserSync.active) {
+  if (browserSync.active) {
     return;
   } 
 
-  gulp.start("less-watcher", function () {
-    lazy.browserSync.reload();
+  gulp.start(["less-watcher", "ts-watcher"], function () {
+    browserSync.reload();
   });
 
-  lazy.browserSync(options);
+  browserSync(options);
 }
 
 
@@ -275,7 +265,7 @@ function useRefBuild () {
       .pipe(gulp.dest(config.build))
       .on("end", function () {
           runSequence("minify-js", "minify-css", "dependency-fixer", function () {
-            del([config.buildJs, config.buildCss, config.buildTmpl], rename);
+            clean([config.buildJs, config.buildCss, config.buildTmpl], rename);
           });
       });
 }
@@ -289,12 +279,12 @@ function rename() {
   gulp.src(config.buildMinJs)
       .pipe(lazy.rename("./build/app/build.js")).pipe(gulp.dest(""))
       .on("end", function () {
-        del(config.buildMinJs);
+        clean(config.buildMinJs);
       });
   gulp.src(config.buildMinCss)
       .pipe(lazy.rename("./build/app/main.css")).pipe(gulp.dest(""))
       .on("end", function () {
-        del(config.buildMinCss);
+        clean(config.buildMinCss);
       });
 }
 
