@@ -381,5 +381,4 @@ gulp.task("env-development", function () {
 gulp.task("env-build", ["minify-html", 
                         "images", 
                         "fonts", 
-                        "template-cache"], useRefBuild
-);
+                        "template-cache"], useRefBuild);
