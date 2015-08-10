@@ -274,7 +274,27 @@ function useRefBuild () {
       .pipe(lazy.useref())
       .pipe(gulp.dest(config.build))
       .on("end", function () {
-          runSequence("minify-js", "minify-css", "dependency-fixer");
+          runSequence("minify-js", "minify-css", "dependency-fixer", function () {
+            del([config.buildJs, config.buildCss, config.buildTmpl], rename);
+          });
+      });
+}
+
+
+/*
+* * * Rename the newly optimized files back to build.js and main.css respectively, then delete the old optimized files, 
+* * * because he useRef in the index.html is always pointing at two files named: build.js and main.css.
+*/
+function rename() {
+  gulp.src(config.buildMinJs)
+      .pipe(lazy.rename("./build/app/build.js")).pipe(gulp.dest(""))
+      .on("end", function () {
+        del(config.buildMinJs);
+      });
+  gulp.src(config.buildMinCss)
+      .pipe(lazy.rename("./build/app/main.css")).pipe(gulp.dest(""))
+      .on("end", function () {
+        del(config.buildMinCss);
       });
 }
 
@@ -361,9 +381,7 @@ gulp.task("env-development", function () {
                 "ts-watcher", 
                 "less-watcher",
                 "new-ts-watcher",
-                "new-less-watcher", function () {
-                    useRefDev();
-                });
+                "new-less-watcher", useRefDev);
 });
 
 
@@ -373,6 +391,5 @@ gulp.task("env-development", function () {
 gulp.task("env-build", ["minify-html", 
                         "images", 
                         "fonts", 
-                        "template-cache"], function () {
-                            useRefBuild();
-});
+                        "template-cache"], useRefBuild
+);

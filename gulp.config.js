@@ -25,6 +25,12 @@ module.exports = function () {
 
 		buildJs: "build/app/build.js",
 
+		buildMinJs: "./build/app/build.optimized.min.js",
+
+		buildMinCss: "./build/app/main.optimized.min.css",
+
+		buildTmpl: "build/app/templates.js",
+
 		dev: "development/",
 
 		devDest: "development/app",
