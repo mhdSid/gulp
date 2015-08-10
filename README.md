@@ -5,8 +5,9 @@ The app first passes through a first phase which is the development phase, and t
 which is the building phase.
 
 In the development phase all Typescript files are compiled, all Less files are converted to CSS, browser prefixes 
-are added to the CSS file, all bowser components are added to the index.html, and all JS/CSS scripts are also added 
-to the index.html. Two watchers are implemented to watch for all Typescript and Less changes in files. 
+are added to the CSS file, all bower components are added to the index.html, and all JS/CSS scripts are also added 
+to the index.html. In addition, two watchers are implemented to watch for all Typescript and Less changes in files. 
+Any new .ts file will be compiled and added automatically to the index.html thourhg a specific additional watcher. Once it's deleted, it will be removed from the index.html.
 
 In the building phase images are compressed, HTML/CSS/JS files are minifed, fonts are copied to the build destination, angular dependencies get fixed, and html files are added to the angular template cache to minimize 
 Ajax calls.
