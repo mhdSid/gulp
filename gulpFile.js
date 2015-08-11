@@ -1,16 +1,16 @@
 /*
-* * * Authored by Mohammad Sidani: mohdsidani@gmail.com
+* * * Authored by Mohammad K. Sidani: mohdsidani@gmail.com / moe.sidani@vinelab.com
 */
 
 'use strict';
 
+var browserSync = require("browser-sync");
+var clean = require("del");
+var config = require("./gulp.config.js")();
 var gulp = require("gulp");
+var lazy = require("gulp-load-plugins")({lazy: true});
 var runSequence = require("run-sequence");
 var wiredep = require("wiredep");
-var config = require("./gulp.config.js")();
-var lazy = require("gulp-load-plugins")({lazy: true});
-var clean = require("del");
-var browserSync = require("browser-sync");
 
 
 /*
@@ -46,7 +46,7 @@ gulp.task("ts-compiler", function () {
 
 /*
 * * * NgAnnotate   
-*/    /*@ngInject*/
+* *   /*@ngInject*/
 gulp.task("dependency-fixer", function () {
   return gulp.src(config.alljs)
              .pipe(lazy.ngAnnotate()) 
@@ -94,6 +94,15 @@ gulp.task("js-injector", function () {
     return gulp.src(config.index)
            .pipe(lazy.inject(gulp.src(config.alljs, {read: false})))
            .pipe(gulp.dest(""));
+});
+
+
+/*
+* * * Move HTML to destination
+*/
+gulp.task("copy-html", function () {
+    return gulp.src(config.allhtml)
+               .pipe(gulp.dest(config.devDest));
 });
 
 
@@ -311,7 +320,7 @@ gulp.task("images", function () {
 /*
 * * * Copying fonts to their destination 
 */
-gulp.task("fonts", function () {
+gulp.task("copy-fonts", function () {
     return gulp.src(config.allfonts)
                .pipe(gulp.dest(config.fontDest))
 });
@@ -366,6 +375,7 @@ gulp.task("env-development", function () {
                 "bower-injector", 
                 "js-injector", 
                 "css-injector",
+                "copy-html",
                 "ts-watcher", 
                 "less-watcher",
                 "new-ts-watcher",
@@ -379,5 +389,5 @@ gulp.task("env-development", function () {
 */
 gulp.task("env-build", ["minify-html", 
                         "images", 
-                        "fonts", 
+                        "copy-fonts", 
                         "template-cache"], useRefBuild);
