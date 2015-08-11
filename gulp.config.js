@@ -51,7 +51,7 @@ module.exports = function () {
 
 		watchTS: ["app/**/*", "development/app/**/*"],
 
-		watchLess: ["app/**/**/**", "development/app/**/**/**"]	
+		watchLess: ["app/**/**/**", "development/app/**/**/**"]
 	};
 	return config;
 };
