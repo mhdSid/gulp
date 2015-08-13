@@ -4,13 +4,13 @@
 
   Open up the terminal in the root directory of the app, and run these commands
   
-    mv ~/Desktop/path-to-my-project/gulp-project-automation/**/  ~/Desktop/path-to-my-project/
+      mv ~/Desktop/path-to-my-project/gulp-project-automation/**/  ~/Desktop/path-to-my-project/
 
-    rm -rf "gulp-project-automation"
+      rm -rf "gulp-project-automation"
   
-    bower install (Optional: in case there's no bower.json file in the current project)
+      bower install (Optional: in case there's no bower.json file in the current project)
     
-    npm install
+      npm install
     
   Then, run 
 
