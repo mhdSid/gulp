@@ -4,7 +4,6 @@
 
   Open up the terminal, and run these commands
   
-
     mv ~/Desktop/path-to-my-project/gulp-project-automation/**/  ~/Desktop/path-to-my-project/
 
     rm -rf "gulp-project-automation"
@@ -13,15 +12,13 @@
     
     npm install
     
-
-
-    Then, run 
+  Then, run 
 
       gulp env-development
 
       gulp env-build
       
-    For Testing, run
+  For Testing, run
 
       karma start karma.conf.js (Results can be seen successfully passed using karma-spec-reporter)
     
