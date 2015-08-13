@@ -12,7 +12,6 @@ var lazy = require("gulp-load-plugins")({lazy: true});
 var runSequence = require("run-sequence");
 var wiredep = require("wiredep");
 
-
 /*
 * * * Compile Typescript  files
 */
@@ -40,7 +39,7 @@ gulp.task("ts-compiler", function () {
       // Specify ECMAScript target version: 'ES3' (default), or 'ES5' 
       target : 'ES5'
     }))
-    .pipe(gulp.dest(config.devDest));
+    .pipe(gulp.dest(config.dev));
 });
 
 
@@ -50,7 +49,7 @@ gulp.task("ts-compiler", function () {
 gulp.task("dependency-fixer", function () {
   return gulp.src(config.alljs)
              .pipe(lazy.ngAnnotate()) 
-             .pipe(gulp.dest(config.devDest));
+             .pipe(gulp.dest(config.dev));
 });
 
 
@@ -60,7 +59,7 @@ gulp.task("dependency-fixer", function () {
 gulp.task("less-css", function () {
   return gulp.src(config.allless)
              .pipe(lazy.less())
-             .pipe(gulp.dest(config.devDestCss));
+             .pipe(gulp.dest(config.dev + "_public/styles/css"));
 });
 
 
@@ -68,12 +67,12 @@ gulp.task("less-css", function () {
 * * * Auto-Prefixer
 */
 gulp.task("auto-prefixer", function () {
-    return gulp.src(config.devMainCss)
+    return gulp.src(config.dev + "_public/styles/css")
            .pipe(lazy.autoprefixer({
                 browsers: ['last 2 versions'],
                 cascade: false
            }))
-           .pipe(gulp.dest(config.devDest));
+           .pipe(gulp.dest(config.dev));
 });
 
 
@@ -102,7 +101,7 @@ gulp.task("js-injector", function () {
 */
 gulp.task("copy-html", function () {
     return gulp.src(config.allhtml)
-               .pipe(gulp.dest(config.devDest));
+               .pipe(gulp.dest(config.dev));
 });
 
 
@@ -122,7 +121,7 @@ gulp.task("css-injector", function () {
 * * * also deleted from index.html
 */ 
 gulp.task("new-ts-watcher", function () {
-    lazy.watch(config.watchTS)
+    lazy.watch("./app/**/")
         .on("add", function (path) {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
@@ -153,7 +152,7 @@ gulp.task("new-ts-watcher", function () {
 * * * will be also deleted from index.html
 */ 
 gulp.task("new-less-watcher", function () {
-    lazy.watch(config.watchLess)
+    lazy.watch("./app/**/")
         .on("add", function (path) {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
@@ -184,9 +183,7 @@ gulp.task("new-less-watcher", function () {
 */
 gulp.task('ts-watcher', function() {
     gulp.watch(config.allts, function () {
-        runSequence("ts-compiler", function () {
-          useRefDev();
-        });
+        runSequence("ts-compiler");
     });
 });
 
@@ -197,9 +194,7 @@ gulp.task('ts-watcher', function() {
 */
 gulp.task('less-watcher', function() {
     gulp.watch(config.allless, function () {
-        runSequence("less-css", function () {
-          useRefDev();
-        });
+        runSequence("less-css");
     });
 });
 
@@ -217,7 +212,7 @@ function startBrowserSync() {
   var options = {
       proxy: "localhost:" + 9090,
       port: 9090,
-      files: config.browserSync,
+      files: ["!./app/_public/styles/less/*.less", "./app/**/*.*"],
       ghostMode: {
         clicks: true,
         location: true,
@@ -248,14 +243,14 @@ function startBrowserSync() {
 /*
 * * * It goes into the index.html. It merges all .js files into build.js and all .css files into main.css. 
 */
-function useRefDev () {
+/*function useRefDev () {
   var assets = lazy.useref.assets();
   gulp.src(config.index)
       .pipe(assets)
       .pipe(assets.restore())
       .pipe(lazy.useref())
       .pipe(gulp.dest(config.dev));
-}
+}*/
 
 
 /*
@@ -265,14 +260,14 @@ function useRefDev () {
 function useRefBuild () {
   var assets = lazy.useref.assets();
   gulp.src(config.index)
-      .pipe(lazy.inject(gulp.src(config.templates, {read: false}), {starttag: "<!-- inject:templates:js -->"}))
+      .pipe(lazy.inject(gulp.src(config.build + "templates.js", {read: false}), {starttag: "<!-- inject:templates:js -->"}))
       .pipe(assets)
       .pipe(assets.restore())
       .pipe(lazy.useref())
-      .pipe(gulp.dest(config.build))
+      .pipe(gulp.dest("./build"))
       .on("end", function () {
           runSequence("minify-js", "minify-css", "dependency-fixer", function () {
-            clean([config.buildJs, config.buildCss, config.buildTmpl], rename);
+            clean([config.build + "main.css", config.build + "build.js", config.build + "templates.js"], rename);
           });
       });
 }
@@ -283,15 +278,15 @@ function useRefBuild () {
 * * * because he useRef in the index.html is always pointing at two files named: build.js and main.css.
 */
 function rename() {
-  gulp.src(config.buildMinJs)
+  gulp.src(config.build + "build.optimized.min.js")
       .pipe(lazy.rename("./build/app/build.js")).pipe(gulp.dest(""))
       .on("end", function () {
-        clean(config.buildMinJs);
+        clean(config.build + "build.optimized.min.js");
       });
-  gulp.src(config.buildMinCss)
+  gulp.src(config.build + "main.optimized.min.css")
       .pipe(lazy.rename("./build/app/main.css")).pipe(gulp.dest(""))
       .on("end", function () {
-        clean(config.buildMinCss);
+        clean(config.build + "main.optimized.min.css");
       });
 }
 
@@ -303,7 +298,7 @@ gulp.task("template-cache", function () {
     return gulp.src(config.allhtml)
                .pipe(lazy.minifyHtml({empty: true}))
                .pipe(lazy.angularTemplatecache())
-               .pipe(gulp.dest(config.buildDest));
+               .pipe(gulp.dest(config.build));
 });
 
 
@@ -313,7 +308,7 @@ gulp.task("template-cache", function () {
 gulp.task("images", function () {
     return gulp.src(config.allimg)
                .pipe(lazy.imagemin({optimizationLevel: 5}))
-               .pipe(gulp.dest(config.imgDest))
+               .pipe(gulp.dest(config.build + "_public/img"))
 });
 
 
@@ -322,7 +317,7 @@ gulp.task("images", function () {
 */
 gulp.task("copy-fonts", function () {
     return gulp.src(config.allfonts)
-               .pipe(gulp.dest(config.fontDest))
+               .pipe(gulp.dest(config.build + "_public/styles/fonts"))
 });
 
 
@@ -332,7 +327,7 @@ gulp.task("copy-fonts", function () {
 gulp.task("minify-html", function () {
     return gulp.src(config.allhtml)
            .pipe(lazy.minifyHtml({conditionals: true, spare:true}))
-           .pipe(gulp.dest(config.buildDest));
+           .pipe(gulp.dest(config.build));
 });
 
 
@@ -340,10 +335,10 @@ gulp.task("minify-html", function () {
 * * * Minify Css
 */
 gulp.task("minify-css", function () {
-    return gulp.src(config.buildCss)
+    return gulp.src(config.build + "main.css")
            .pipe(lazy.minifyCss({keepBreaks: false}))
            .pipe(lazy.rename({suffix: '.optimized.min'}))
-           .pipe(gulp.dest(config.buildDest));
+           .pipe(gulp.dest(config.build));
 });
 
 
@@ -351,11 +346,11 @@ gulp.task("minify-css", function () {
 * * * Minify JS
 */
 gulp.task("minify-js", function () {
-    return gulp.src(config.buildJs)
+    return gulp.src(config.build + "build.js")
            .pipe(lazy.stripDebug())
            .pipe(lazy.uglify())
            .pipe(lazy.rename({suffix: '.optimized.min'}))
-           .pipe(gulp.dest(config.buildDest));
+           .pipe(gulp.dest(config.build));
 });
 
 
@@ -380,7 +375,7 @@ gulp.task("env-development", function () {
                 "less-watcher",
                 "new-ts-watcher",
                 "new-less-watcher",
-                "browser-sync", useRefDev);
+                "browser-sync");
 });
 
 
