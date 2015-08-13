@@ -3,6 +3,7 @@
 # Installation
 
   Open up the terminal, and run these commands
+  
 
     mv ~/Desktop/path-to-my-project/gulp-project-automation/**/  ~/Desktop/path-to-my-project/
 
@@ -11,6 +12,8 @@
     bower install (Optional: in case there's no bower.json file in the current project)
     
     npm install
+    
+
 
     Then, run 
 
