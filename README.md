@@ -2,7 +2,7 @@
 
 # Installation
 
-  Open up the terminal, and run these commands
+  Open up the terminal in the root directory of the app, and run these commands
   
     mv ~/Desktop/path-to-my-project/gulp-project-automation/**/  ~/Desktop/path-to-my-project/
 
