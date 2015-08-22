@@ -10,9 +10,7 @@
   "ignore": [
     "**/.*",
     "node_modules",
-    "bower_packages",
-    "test",
-    "tests"
+    "bower_packages"
   ],
   "dependencies": {
     "angular": "1.4.0",
