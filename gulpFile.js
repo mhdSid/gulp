@@ -2,77 +2,146 @@
 * * * Authored by Mohammad K. Sidani: mohdsidani@gmail.com / moe.sidani@vinelab.com
 */
 
-'use strict';
+(function () {
 
-var browserSync = require("browser-sync");
-var clean = require("del");
-var config = require("./gulp.config.js")();
-var gulp = require("gulp");
-var lazy = require("gulp-load-plugins")({lazy: true});
-var runSequence = require("run-sequence");
-var wiredep = require("wiredep");
+  'use strict';
+
+  var browserSync = require("browser-sync");
+  var clean = require("del");
+  var config = require("./gulp.config.js")();
+  var gulp = require("gulp");
+  var lazy = require("gulp-load-plugins")({lazy: true});
+  var runSequence = require("run-sequence"); /* Exceptionally used to run tasks in a sequence - not in parallel */
+  var wiredep = require("wiredep");
+
+
+  /*                                 */
+ /* * * Development Environment * * */
+/*                                 */
 
 /*
-* * * Compile Typescript  files
+* * * Run this task to List all tasks
+*/
+gulp.task("list-tasks", lazy.taskListing);
+
+
+/*
+* * * Compile Typescript to JavaScript 
 */
 gulp.task("ts-compiler", function () {
-  return gulp.src(config.allts)
-    .pipe(lazy.typescript({
-      // Generates corresponding .map file. 
-      sourceMap : false,
+    return gulp.src(config.allts)
+               .pipe(lazy.typescript({
+                // Generates corresponding .map file. 
+                sourceMap : false,
+                
+                // Generates corresponding .d.ts file. 
+                declaration : true,
  
-      // Generates corresponding .d.ts file. 
-      declaration : true,
+                // Do not emit comments to output. 
+                removeComments : false,
  
-      // Do not emit comments to output. 
-      removeComments : false,
+                // Warn on expressions and declarations with an implied 'any' type. 
+                noImplicitAny : false,
  
-      // Warn on expressions and declarations with an implied 'any' type. 
-      noImplicitAny : false,
+                // Skip resolution and preprocessing. 
+                noResolve : false,
  
-      // Skip resolution and preprocessing. 
-      noResolve : false,
+                // Specify module code generation: 'commonjs' or 'amd'   
+                module : "amd",
  
-      // Specify module code generation: 'commonjs' or 'amd'   
-      module : 'amd',
+                // Specify ECMAScript target version: 'ES3' (default), or 'ES5' 
+                target : "ES5"
+              }))
+              .pipe(gulp.dest(config.dev));
+});
+/*
+* * * This task is used for testing. Compile a simple ts file to js
+*/
+gulp.task("test-ts-compiler", function () {
+          return gulp.src("./Test/lib/*.ts")
+                       .pipe(lazy.typescript({
+                        // Generates corresponding .map file. 
+                        sourceMap : false,
+                
+                        // Generates corresponding .d.ts file. 
+                        declaration : true,
  
-      // Specify ECMAScript target version: 'ES3' (default), or 'ES5' 
-      target : 'ES5'
-    }))
-    .pipe(gulp.dest(config.dev));
+                        // Do not emit comments to output. 
+                        removeComments : false,
+ 
+                        // Warn on expressions and declarations with an implied 'any' type. 
+                        noImplicitAny : false,
+ 
+                        // Skip resolution and preprocessing. 
+                        noResolve : false,
+ 
+                        // Specify module code generation: 'commonjs' or 'amd'   
+                        module : "amd",
+ 
+                        // Specify ECMAScript target version: 'ES3' (default), or 'ES5' 
+                        target : "ES5"
+                      }))
+                      .pipe(gulp.dest("./Test/dest"));
 });
 
 
 /*
-* * * NgAnnotate   
-* *   /*@ngInject*/
-gulp.task("dependency-fixer", function () {
-  return gulp.src(config.alljs)
-             .pipe(lazy.ngAnnotate()) 
-             .pipe(gulp.dest(config.dev));
-});
-
-
-/*
-* * * LESS to CSS
+* * * Less to Css conversion 
 */
 gulp.task("less-css", function () {
-  return gulp.src(config.allless)
-             .pipe(lazy.less())
-             .pipe(gulp.dest(config.dev + "_public/styles/css"));
+    return gulp.src(config.allless)
+               .pipe(lazy.less())
+               .pipe(gulp.dest(config.dev + "_public/styles/css/"));
+});
+/*
+* * *This task is used for testing. Compile simple less file to css
+*/
+gulp.task("test-less-css", function () {
+    return gulp.src("./Test/lib/*.less")
+               .pipe(lazy.less())
+               .pipe(gulp.dest("./Test/dest"));
 });
 
 
 /*
-* * * Auto-Prefixer
+* * * Concat all Css files in one file
+*/
+gulp.task("concat-css", function () {
+    return gulp.src(config.allcss)
+               .pipe(lazy.concatCss("main.css"))
+               .pipe(gulp.dest(config.dev + "_public/styles/css/"));
+});
+/*
+* * *This task is used for testing. Concat css files
+*/
+gulp.task("test-concat-css", function () {
+    return gulp.src(["./Test/dest/test-style*.css", "./Test/dest/newstyle.css"])
+               .pipe(lazy.concatCss("test-main.css"))
+               .pipe(gulp.dest("./Test/dest/dest/"));
+});
+
+
+/*
+* * * Add browser prefixes to make the Css rules compatible across browsers in the main.css file
 */
 gulp.task("auto-prefixer", function () {
-    return gulp.src(config.dev + "_public/styles/css")
-           .pipe(lazy.autoprefixer({
-                browsers: ['last 2 versions'],
-                cascade: false
-           }))
-           .pipe(gulp.dest(config.dev));
+    return gulp.src(config.dev + "_public/styles/css/main.css")
+               .pipe(lazy.autoprefixer({
+                  browsers: ["> 0%"],
+                  cascade: true
+               }))
+               .pipe(gulp.dest(config.dev + "_public/styles/css/"));
+});
+/*
+* * * This task is used for testing. Simply adds browser prefixes to the main css file test-main.css
+*/
+gulp.task("test-auto-prefixer", function () {
+    return gulp.src("./Test/dest/dest/test-main.css")
+               .pipe(lazy.autoprefixer({
+                  browsers: ["> 0%"],
+                  cascade: true
+               }))
+               .pipe(gulp.dest("./Test/dest/dest/"));
 });
 
 
@@ -81,23 +150,56 @@ gulp.task("auto-prefixer", function () {
 */
 gulp.task("bower-injector", function () {
     return gulp.src(config.index)
-           .pipe(wiredep.stream())
-           .pipe(gulp.dest(""));
+               .pipe(wiredep.stream())
+               .pipe(gulp.dest(""));
+});
+/*
+* * * This task is used for testing. Simply adds bower components into test-index.html
+*/
+gulp.task("test-bower-injector", function () {
+    return gulp.src(config.index)
+               .pipe(wiredep.stream())
+               .pipe(lazy.rename({prefix: 'test-'}))
+               .pipe(gulp.dest("./Test/dest/dest"));
 });
 
 
 /*
-* * * Inject all JS into index.html
+* * * Inject all JavaScript files into index.html
 */
 gulp.task("js-injector", function () {                                    
     return gulp.src(config.index)
-           .pipe(lazy.inject(gulp.src(config.alljs, {read: false})))
-           .pipe(gulp.dest(""));
+               .pipe(lazy.inject(gulp.src(config.alljs, {read: false})))
+               .pipe(gulp.dest(""));
+});
+/*
+* * * This task is used for testing. Simply adds js scripts components into test-index.html
+*/
+gulp.task("test-js-injector", function () {                                    
+    return gulp.src("./Test/dest/dest/test-index.html")
+               .pipe(lazy.inject(gulp.src("./test/dest/*.js", {read: false})))
+               .pipe(gulp.dest("./Test/dest/dest"));
 });
 
+/*
+* * * Inject all Css files into index.html
+*/
+gulp.task("css-injector", function () {
+    return gulp.src(config.index)
+               .pipe(lazy.inject(gulp.src(config.dev + "_public/styles/css/main.css", {read: false})))
+               .pipe(gulp.dest(""));
+});
+/*
+* * * This task is used for testing. Simply adds Css scripts components into test-index.html
+*/
+gulp.task("test-css-injector", function () {
+    return gulp.src("./Test/dest/dest/test-index.html")
+               .pipe(lazy.inject(gulp.src("./Test/dest/dest/test-main.css", {read: false})))
+               .pipe(gulp.dest("./Test/dest/dest/"));
+});
 
 /*
-* * * Move HTML to destination
+* * * Move all HTML files to "development" destination
 */
 gulp.task("copy-html", function () {
     return gulp.src(config.allhtml)
@@ -106,42 +208,29 @@ gulp.task("copy-html", function () {
 
 
 /*
-* * * Inject all CSS into index.html
-*/
-gulp.task("css-injector", function () {
-    return gulp.src(config.index)
-           .pipe(lazy.inject(gulp.src(config.allcss)))
-           .pipe(gulp.dest(""));
-});
-
-
-/*
 * * *  Watch for newly added Typescript files, compile them, and then added their Js files into index.html. 
 * * * If a file has been deleted, its corresponding Js will be deleted and its following script will be 
 * * * also deleted from index.html
 */ 
-gulp.task("new-ts-watcher", function () {
-    lazy.watch("./app/**/")
-        .on("add", function (path) {
-            var index = path.indexOf(config.client);
-            var filePath = path.substring(index);
-            var suffix = path.substring(path.length - 3);
-            console.log("New file has been added " + filePath);
-            if (suffix === ".ts") {
-              runSequence("ts-compiler", "js-injector");
-            }
+gulp.task("ts-watcher", function () {
+    lazy.watch(["./app/**/", "!./app/**/*.html" ,"!./app/**/**/**/*.less", "!./app/**/**/**/*.css"])
+        .on("add", function (path) {  
+          console.log("New file has been added " + path);
+          runSequence("ts-compiler", "js-injector"); 
+        })
+        .on("change", function (path) {
+            console.log("File has been changed " + path);
+            gulp.start("ts-compiler");
         })
         .on("unlink", function (path) {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
             var suffix = path.substring(path.length - 3);
+            var jsPath = filePath.replace(".ts", ".js").replace("/app", "/development/app");
             console.log("File has been deleted " + filePath);
-            if (suffix === ".ts") {
-              var jsPath = filePath.replace(".ts", ".js").replace("/app", "./development/app");
-              clean(jsPath, function () {
-                gulp.start("js-injector");
-              });
-            }
+            clean(jsPath, function () {
+              gulp.start("js-injector");
+            });
         });
 });
 
@@ -151,51 +240,29 @@ gulp.task("new-ts-watcher", function () {
 * * * If a file has been deleted, its corresponding Css will be deleted and its following stylesheet 
 * * * will be also deleted from index.html
 */ 
-gulp.task("new-less-watcher", function () {
-    lazy.watch("./app/**/")
+gulp.task("less-watcher", function () {
+    lazy.watch(["./app/**/", "!./app/*.ts", "!./app/**/*.html", "!./app/**/*.ts", "!./app/**/**/**/*.css"])
         .on("add", function (path) {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
             var suffix = path.substring(path.lastIndexOf("."));
-            console.log("New file has been added " + filePath);
-            if (suffix === ".less") {
-              runSequence("less-css", "css-injector");
-            }
+            console.log("New file has been added " + path);
+            runSequence("less-css", "concat-css", "auto-prefixer", "css-injector");
+        })
+        .on("change", function (path) {
+            console.log("File has been changed " + path);
+            runSequence("less-css", "concat-css", "auto-prefixer");
         })
         .on("unlink", function (path) {
             var index = path.indexOf(config.client);
             var filePath = path.substring(index);
             var suffix = path.substring(path.lastIndexOf("."));
-            console.log("New file has been deleted " + filePath);
-            if (suffix === ".less") {
-              var cssPath = filePath.replace("less", "css").replace(".less", ".css").replace("/app", "./development/app");
-              clean(cssPath, function () {
-                gulp.start("css-injector");
-              });
-            }
+            var cssPath = filePath.replace("less", "css").replace(".less", ".css").replace("/app", "/development/app");
+            console.log("File has been deleted " + filePath);
+            clean(cssPath, function () {
+              gulp.start("css-injector");
+            });
         });
-});
-
-
-/*
-* * * Watch for changes in typescript files, recompiles the files, and then merges them 
-* * * into one file using the useRef method
-*/
-gulp.task('ts-watcher', function() {
-    gulp.watch(config.allts, function () {
-        runSequence("ts-compiler");
-    });
-});
-
-
-/*
-* * * Watch for changes in less files, converts from less to css, and then merges them
-* * * into one file using the useRef method 
-*/
-gulp.task('less-watcher', function() {
-    gulp.watch(config.allless, function () {
-        runSequence("less-css");
-    });
 });
 
 
@@ -206,7 +273,7 @@ gulp.task("browser-sync", startBrowserSync);
 
 
 /*
-* * * Browser Sync function.
+* * * Browser Sync configuration. Synchronize code across browsers. Watch for changes and reload the browsers.
 */
 function startBrowserSync() {
   var options = {
@@ -240,17 +307,114 @@ function startBrowserSync() {
 }
 
 
+
+
+
+
+
+  /*                                  */
+ /* * *     Build Environment    * * */
+/*                                  */
+
 /*
-* * * It goes into the index.html. It merges all .js files into build.js and all .css files into main.css. 
+* * * Minify Html
 */
-/*function useRefDev () {
-  var assets = lazy.useref.assets();
-  gulp.src(config.index)
-      .pipe(assets)
-      .pipe(assets.restore())
-      .pipe(lazy.useref())
-      .pipe(gulp.dest(config.dev));
-}*/
+gulp.task("minify-html", function () {
+    return gulp.src(config.allhtml)
+               .pipe(lazy.minifyHtml({conditionals: true, spare:true}))
+               .pipe(gulp.dest(config.build));
+});
+/*
+* * * This task is used for testing. To check whether a simple html page has been minified or not
+*/
+gulp.task("test-minify-html", function () {
+    return gulp.src("./Test/lib/test.html")
+               .pipe(lazy.minifyHtml({conditionals: true, spare:true}))
+               .pipe(lazy.rename({suffix: ".min"}))
+               .pipe(gulp.dest("./Test/dest/"));
+});
+
+
+/*
+* * * Compressing Images
+*/
+gulp.task("images", function () {
+    return gulp.src(config.allimg)
+               .pipe(lazy.imagemin({optimizationLevel: 5}))
+               .pipe(gulp.dest(config.build + "_public/img"))
+});
+
+
+/*
+* * * Copying fonts to their destination 
+*/
+gulp.task("copy-fonts", function () {
+    return gulp.src(config.allfonts)
+               .pipe(gulp.dest(config.build + "_public/styles/fonts"))
+});
+
+
+/*
+* * * Template cache
+*/  
+gulp.task("template-cache", function () {
+    return gulp.src(config.allhtml)
+               .pipe(lazy.minifyHtml({empty: true}))
+               .pipe(lazy.angularTemplatecache())
+               .pipe(gulp.dest(config.build));
+});
+
+
+/*
+* * * Minify Css
+*/
+gulp.task("minify-css", function () {
+    return gulp.src(config.build + "main.css")
+               .pipe(lazy.minifyCss({keepBreaks: false}))
+               .pipe(lazy.rename({suffix: '.optimized.min'}))
+               .pipe(gulp.dest(config.build));
+});
+/*
+* * * This task is used for testing. To check whether a simple css file has been minified or not
+*/
+gulp.task("test-minify-css", function () {
+    return gulp.src("./Test/lib/test.css")
+               .pipe(lazy.minifyCss({keepBreaks: false}))
+               .pipe(lazy.rename({suffix: ".min"}))
+               .pipe(gulp.dest("./Test/dest/"));
+});
+
+
+/*
+* * * Minify JS
+*/
+gulp.task("minify-js", function () {
+    return gulp.src(config.build + "build.js")
+               .pipe(lazy.stripDebug())
+               .pipe(lazy.uglify())
+               .pipe(lazy.rename({suffix: '.optimized.min'}))
+               .pipe(gulp.dest(config.build));
+});
+/*
+* * * This task is used for testing. To check whether a simple css file has been minified or not
+*/
+gulp.task("test-minify-js", function () {
+    return gulp.src("./Test/lib/test.js")
+               .pipe(lazy.stripDebug())
+               .pipe(lazy.uglify())
+               .pipe(lazy.rename({suffix: ".min"}))
+               .pipe(gulp.dest("./Test/dest/"));
+});
+
+
+/*
+* * * Fix angular's dependecie's names 
+*/
+gulp.task("dependency-fixer", function () {
+  return gulp.src(config.alljs)
+             .pipe(lazy.ngAnnotate()) 
+             .pipe(gulp.dest(config.dev));
+});
 
 
 /*
@@ -279,110 +443,51 @@ function useRefBuild () {
 */
 function rename() {
   gulp.src(config.build + "build.optimized.min.js")
-      .pipe(lazy.rename("./build/app/build.js")).pipe(gulp.dest(""))
+      .pipe(lazy.rename("./build/app/build.js"))
+      .pipe(gulp.dest(""))
       .on("end", function () {
         clean(config.build + "build.optimized.min.js");
       });
   gulp.src(config.build + "main.optimized.min.css")
-      .pipe(lazy.rename("./build/app/main.css")).pipe(gulp.dest(""))
+      .pipe(lazy.rename("./build/app/main.css"))
+      .pipe(gulp.dest(""))
       .on("end", function () {
         clean(config.build + "main.optimized.min.css");
       });
 }
 
 
-/*
-* * * Template cache
-*/  
-gulp.task("template-cache", function () {
-    return gulp.src(config.allhtml)
-               .pipe(lazy.minifyHtml({empty: true}))
-               .pipe(lazy.angularTemplatecache())
-               .pipe(gulp.dest(config.build));
-});
 
+
+
+
+  /*                                 */
+ /* * *      Two Main Tasks     * * */
+/*                                 */
 
 /*
-* * * Compressing Images
-*/
-gulp.task("images", function () {
-    return gulp.src(config.allimg)
-               .pipe(lazy.imagemin({optimizationLevel: 5}))
-               .pipe(gulp.dest(config.build + "_public/img"))
-});
-
-
-/*
-* * * Copying fonts to their destination 
-*/
-gulp.task("copy-fonts", function () {
-    return gulp.src(config.allfonts)
-               .pipe(gulp.dest(config.build + "_public/styles/fonts"))
-});
-
-
-/*
-* * * Minify Html
-*/
-gulp.task("minify-html", function () {
-    return gulp.src(config.allhtml)
-           .pipe(lazy.minifyHtml({conditionals: true, spare:true}))
-           .pipe(gulp.dest(config.build));
-});
-
-
-/*
-* * * Minify Css
-*/
-gulp.task("minify-css", function () {
-    return gulp.src(config.build + "main.css")
-           .pipe(lazy.minifyCss({keepBreaks: false}))
-           .pipe(lazy.rename({suffix: '.optimized.min'}))
-           .pipe(gulp.dest(config.build));
-});
-
-
-/*
-* * * Minify JS
-*/
-gulp.task("minify-js", function () {
-    return gulp.src(config.build + "build.js")
-           .pipe(lazy.stripDebug())
-           .pipe(lazy.uglify())
-           .pipe(lazy.rename({suffix: '.optimized.min'}))
-           .pipe(gulp.dest(config.build));
-});
-
-
-/*
-* * * List all tasks
-*/
-gulp.task("list-tasks", lazy.taskListing);
-
-
-/*
-* * * Prepare for the development environment.  
+* * * Fire the main task to create the "development" environment.  
 */
 gulp.task("env-development", function () {
     runSequence("ts-compiler", 
                 "less-css", 
-                "auto-prefixer", 
+                "concat-css",
+                "auto-prefixer",
                 "bower-injector", 
                 "js-injector", 
                 "css-injector",
                 "copy-html",
                 "ts-watcher", 
                 "less-watcher",
-                "new-ts-watcher",
-                "new-less-watcher",
                 "browser-sync");
 });
 
 
 /*
-* * * Prepare for the building environment. Optimize All. For publishing app.js lib.js app.css lib.css
+* * * Fire the main tasks to prepare the "build" environment. Optimize All. For publishing app.js lib.js app.css lib.css
 */
 gulp.task("env-build", ["minify-html", 
                         "images", 
                         "copy-fonts", 
                         "template-cache"], useRefBuild);
+}());
