@@ -9,16 +9,16 @@
       var browserSync = require("browser-sync");
       var ts_watcher, less_watcher;
 
-      test_ts_compiler("./Test/dest/file.js", "normal"); // FIRST CALL 
+      test_ts_compiler("./test/dest/file.js", "normal"); // FIRST CALL 
 
       /*
       * * * It should compile from ts to js and read the js file from the destination folder
       */
       function test_ts_compiler (file, type) {
           console.log(" ");
-          console.log("1- test_ts_compiler ");
+          console.log("1- Test_ts_compiler ");
           console.log(" ");
-          exec("gulp test-ts-compiler", function (error, stdout, stderr) {
+          exec("gulp Test-ts-compiler", function (error, stdout, stderr) {
               console.log(stdout);
               if (error !== null) {
                 console.log('exec error: ' + error);
@@ -46,20 +46,20 @@
           console.log(" ");
           console.log("2- test_less_css ");
           console.log(" ");
-          exec("gulp test-less-css", function (error, stdout, stderr) {
+          exec("gulp Test-less-css", function (error, stdout, stderr) {
               console.log(stdout);
               if (error !== null) {
                 console.log('exec error: ' + error);
               }
               if (type === "normal") {
-                  fs.readFile("./Test/dest/test-style.css", function (error) {
+                  fs.readFile("./test/dest/test-style.css", function (error) {
                     if (error !== null) {
                       console.log("Error: File doesn't exist.");
                     } else {
                       console.log("SUCESS: File has been successfully read: test-style.css");
                     }
                   });
-                  fs.readFile("./Test/dest/test-style1.css", function (error) {
+                  fs.readFile("./test/dest/test-style1.css", function (error) {
                     if (error !== null) {
                       console.log("Error: File doesn't exist.");
                     } else {
@@ -69,7 +69,7 @@
                   });
               }
               else {
-                fs.readFile("./Test/dest/newstyle.css", function (error) {
+                fs.readFile("./test/dest/newstyle.css", function (error) {
                     if (error !== null) {
                       console.log("Error: File doesn't exist.");
                     } else {
@@ -88,13 +88,13 @@
           console.log(" ");
           console.log("3- test_concat_css ");
           console.log(" ");
-          exec("gulp test-concat-css", function (error, stdout, stderr) {
+          exec("gulp Test-concat-css", function (error, stdout, stderr) {
               console.log(stdout);
               if (error !== null) {
                 console.log('exec error: ' + error);
               }
 
-              fs.readFile("./Test/dest/dest/test-main.css", function (error) {
+              fs.readFile("./test/dest/dest/test-main.css", function (error) {
                 if (error !== null) {
                   console.log("Error: File doesn't exist.");
                 } else {
@@ -112,13 +112,13 @@
           console.log(" ");
           console.log("4- test_auto_prefixer ");
           console.log(" ");
-          exec("gulp test-auto-prefixer", function (error, stdout, stderr, data) {
+          exec("gulp Test-auto-prefixer", function (error, stdout, stderr, data) {
               console.log(stdout);
               if (error !== null) {
                 console.log('exec error: ' + error);
               }
 
-              fs.readFile("./Test/dest/dest/test-main.css", function (error, data) {
+              fs.readFile("./test/dest/dest/test-main.css", function (error, data) {
                 if (error !== null) {
                   console.log("Error: File doesn't exist.");
                 } else {
@@ -146,13 +146,13 @@
           console.log(" ");
           console.log("5- test_bower_injector ");
           console.log(" ");
-          exec("gulp test-bower-injector", function (error, stdout, stderr) {
+          exec("gulp Test-bower-injector", function (error, stdout, stderr) {
               console.log(stdout);
               if (error !== null) {
                 console.log('exec error: ' + error);
               }
 
-              fs.readFile("./Test/dest/dest/test-index.html", function (error, data) {
+              fs.readFile("./test/dest/dest/test-index.html", function (error, data) {
                 if (error !== null) {
                   console.log("Error: File doesn't exist.");
                 } else {
@@ -176,16 +176,17 @@
           console.log(" ");
           console.log("6- test_js_injector ");
           console.log(" ");
-          exec("gulp test-js-injector", function (error, stdout, stderr) {
+          exec("gulp Test-js-injector", function (error, stdout, stderr) {
               console.log(stdout);
               if (error !== null) {
                 console.log('exec error: ' + error);
               }
 
-              fs.readFile("./Test/dest/dest/test-index.html", function (error, data) {
+              fs.readFile("./test/dest/dest/test-index.html", function (error, data) {
                 if (error !== null) {
                   console.log("Error: File doesn't exist.");
-                } else {
+                } 
+                else {
                   console.log("SUCESS: File has been read successfully.");
                   var buffer = data.toString();
                   console.log('<script src="/test/dest/' + file + '"></script>');
@@ -200,7 +201,8 @@
                       console.log("Deleting 'newfile.ts'...");
                       delete_new_file("newfile.ts");
                     }
-                  } else {
+                  } 
+                  else {
                     console.error("Error: There was an error adding " + file + " script into test-index.html. Maybe it has been unInjected.");
                     ts_watcher.close();
                     setTimeout(function () {
@@ -219,19 +221,19 @@
           console.log(" ");
           console.log("7- test_css_injector ");
           console.log(" ");
-          exec("gulp test-css-injector", function (error, stdout, stderr) {
+          exec("gulp Test-css-injector", function (error, stdout, stderr) {
               console.log(stdout);
               if (error !== null) {
                 console.log('exec error: ' + error);
               }
 
-              fs.readFile("./Test/dest/dest/test-index.html", function (error, data) {
+              fs.readFile("./test/dest/dest/test-index.html", function (error, data) {
                 if (error !== null) {
                   console.log("Error: File doesn't exist.");
                 } else {
                   console.log("SUCESS: File has been read successfully.");
                   var buffer = data.toString();
-                  if (buffer.search('<link rel="stylesheet" href="/Test/dest/dest/test-main.css">') !== -1) {
+                  if (buffer.search('<link rel="stylesheet" href="/test/dest/dest/test-main.css">') !== -1) {
                     console.log("SUCESS: The stylesheet with href pointing to test-main.css has been successfully added to test-index.html");
                     if (type === "normal") {
                       test_ts_watcher();
@@ -264,20 +266,20 @@
         console.log("8- test_ts_watcher ");
         console.log(" ");
           
-        ts_watcher = fs.watch("./Test/lib/", function (event, file) {
+        ts_watcher = fs.watch("./test/lib/", function (event, file) {
             if (event === "rename") {
-              fs.readFile("./Test/lib/newfile.ts", function (error, data) {
+              fs.readFile("./test/lib/newfile.ts", function (error, data) {
                 if (error !== null) {
                   console.log("File has been deleted: " + file);
                   delete_file("newfile.js", "js"); //then delete the corresponding js file
                 } else {
                   console.log("New file has been added: " + file);
-                  test_ts_compiler("./Test/lib/newfile.ts", "new file");
+                  test_ts_compiler("./test/lib/newfile.ts", "new file");
                 }
               });
             } else if (event === "change") {
                 console.log("File has been changed: " + file);
-                test_ts_compiler("./Test/lib/newfile.ts", "change file");
+                test_ts_compiler("./test/lib/newfile.ts", "change file");
             }
         });
 
@@ -287,17 +289,26 @@
         }, 50);
       };
 
+      /*
+      * * * It writes a file
+      */
      function write_new_file (file) {
-        fs.writeFile("./Test/lib/" + file, function (error, data) { 
+        fs.writeFile("./test/lib/" + file, function (error, data) { 
         });
      };
 
+     /*
+     * * * It deletes a file
+     */
      function delete_new_file (file) {
-        fs.unlink("./Test/lib/" + file, function (error, data) { 
+        fs.unlink("./test/lib/" + file, function (error, data) { 
         });
      };
 
-     function delete_directory (path) {
+     /*
+     * * * It deletes a full directory ./test/dest/
+     */
+    function delete_directory (path) {
       if( fs.existsSync(path) ) {
         fs.readdirSync(path).forEach(function(file,index) {
           var curPath = path + "/" + file;
@@ -312,30 +323,35 @@
       }
     };
 
-     function delete_file (file, type) {
-        fs.unlink("./Test/dest/" + file, function (error, data) { 
+    /*
+    * * * It deletes a file according to type
+    */
+    function delete_file (file, type) {
+        fs.unlink("./test/dest/" + file, function (error, data) { 
           if (type === "js")
             test_js_injector(file);
           else if (type === "css") {
             test_css_injector("delete file");
           }
         });
-     };
+    };
 
+     /*
+     * * * It manipulates newfile.ts changes data to changedData
+     */
      function change_file () {
-        fs.readFile("./Test/lib/newfile.ts", 'utf8', function (error, data) {
+        fs.readFile("./test/lib/newfile.ts", 'utf8', function (error, data) {
           if (error) 
             return console.log(error);
           
           var result = data.replace(/data/g, 'changedData');
 
-          fs.writeFile("./Test/lib/newfile.ts", result, 'utf8', function (err) {
-            if (err) 
-              return console.log(err);
+          fs.writeFile("./test/lib/newfile.ts", result, 'utf8', function (error) {
+            if (error) 
+              return console.log(error);
           });
         });
      };
-
 
      /*
      * * * It should watch for ts changes
@@ -345,9 +361,9 @@
         console.log("9- test_less_watcher ");
         console.log(" ");
           
-        less_watcher = fs.watch("./Test/lib/", function (event, file) {
+        less_watcher = fs.watch("./test/lib/", function (event, file) {
             if (event === "rename") {
-              fs.readFile("./Test/lib/newstyle.less", function (error, data) {
+              fs.readFile("./test/lib/newstyle.less", function (error, data) {
                 if (error !== null) {
                   console.log("File has been deleted: " + file);
                   delete_file("newstyle.css", "css"); //then delete the corresponding css file
@@ -368,7 +384,6 @@
         }, 50);
       };
 
-
     /*
     * * * It should check if browser sync package is active and working good
     */
@@ -385,15 +400,15 @@
           });
           console.log("Initiated browser-sync");
           setTimeout(function () {
-            test_minify("gulp test-minify-html", "./Test/lib/test.html", "./Test/dest/test.min.html", "11", "html");
-            test_minify("gulp test-minify-css", "./Test/lib/test.css", "./Test/dest/test.min.css", "12", "css");
-            test_minify("gulp test-minify-js", "./Test/lib/test.js", "./Test/dest/test.min.js", "13", "js");
+            test_minify("gulp Test-minify-html", "./test/lib/test.html", "./test/dest/test.min.html", "11", "html");
+            test_minify("gulp Test-minify-css", "./test/lib/test.css", "./test/dest/test.min.css", "12", "css");
+            test_minify("gulp Test-minify-js", "./test/lib/test.js", "./test/dest/test.min.js", "13", "js");
           }, 500);
         }, 5000); 
     };
 
     /*
-    * * * It should minify html file
+    * * * It should minify a html file
     */
     function test_minify (cmd, file, fileMin, num, type) {
       console.log(" ");
@@ -413,25 +428,116 @@
               console.log("Error: File doesn't exist.");
             } 
             bufferAfterMin = data.toString();
-        });
-        setTimeout(function () {
-          if (bufferBeforeMin === bufferAfterMin)
-            console.log("Error: There was an error minifying this file " + file);
-          else 
-            console.log("SUCESS: The file " + file + " has been successfully minifed.");
+            if (bufferBeforeMin === bufferAfterMin)
+              console.log("Error: There was an error minifying this file " + file);
+            else 
+              console.log("SUCESS: The file " + file + " has been successfully minifed.");
             if (num === "13") {
-              console.log(" ");
-              console.log("'Gulp' and the NPM packages required to run the 'Gulp' tasks are perfectly installed on your system.");
-              console.log(" ");
-              console.log("You can run the Gulp tasks: gulp <task_name> or gulp env-development / gulp env-build");
-              console.log(" ");
-              delete_directory("./Test/dest");
-              setTimeout(function () {
-                exec("kill " + process.pid, function (err, data) { 
-                  console.log(err, data); 
-                })}, 1000);
+              test_minify_images();
             }
-        }, 500);
+        });
       });
     };
+
+    /*
+    * * * It should minify an image
+    */ 
+    function test_minify_images () {
+      console.log(" ");
+      console.log("14- test_minify_images");
+      console.log(" ");
+
+      var bufferBeforeMin, bufferAfterMin;
+      fs.readFile("./test/lib/img.jpg", function (error, data) {
+          if (error !== null) {
+            console.log("Error: File doesn't exist.");
+          } 
+          bufferBeforeMin = data.length;
+      });
+      exec("gulp Test-images", function (error, stdout, stderr) {
+        console.log(stdout);
+        if (error !== null) {
+          console.log('exec error: ' + error);
+        }
+        fs.readFile("./test/dest/img.jpg", function (error, data) {
+            if (error !== null) {
+              console.log("Error: File doesn't exist.");
+            } 
+            bufferAfterMin = data.length;
+            if(bufferAfterMin < bufferBeforeMin) {
+              console.log("The image has been successfully minified.");
+              test_tempalte_cache();
+            }
+        });
+      });
+    };  
+
+    /*
+    * * * IT should put an HTML partial in the cache
+    */  
+    function test_tempalte_cache () {
+      console.log(" ");
+      console.log("15- test_template_cache");
+      console.log(" ");
+      var bufferAfterMin;
+
+      exec("gulp Test-template-cache", function (error, stdout, stderr) {
+        console.log(stdout);
+        if (error !== null) {
+          console.log('exec error: ' + error);
+        }
+        fs.readFile("./test/dest/templates.js", function (error, data) {
+            if (error !== null) {
+              console.log("Error: File doesn't exist.");
+            } 
+            bufferAfterMin = data.toString();
+            if(bufferAfterMin.search(".run") !== -1) {
+              console.log("The html template has been put in the cache.");
+              console.log(" ");
+              test_dependency_fixer();
+            }
+        });
+      });
+    };
+
+    /*
+    * * * It should inject angular dependecies 
+    */
+    function test_dependency_fixer () {
+      console.log(" ");
+      console.log("16- test_dependency_fixer");
+      console.log(" ");
+
+      var bufferBeforeMin, bufferAfterMin;
+      fs.readFile("./test/lib/dependency-test.js", function (error, data) {
+          if (error !== null) {
+            console.log("Error: File doesn't exist.");
+          } 
+          bufferBeforeMin = data.toString();;
+      });
+      exec("gulp Test-dependency-fixer", function (error, stdout, stderr) {
+        console.log(stdout);
+        if (error !== null) {
+          console.log('exec error: ' + error);
+        }
+        fs.readFile("./test/dest/dependency-test.js", function (error, data) {
+          bufferAfterMin = data.toString();
+          if (bufferAfterMin !== bufferBeforeMin) {
+            console.log("ngAnnotate has injected dependecies into ./test/dest/dependency-test.js");
+            console.log(" ");
+            console.log("'Gulp' and the NPM packages required to run the 'Gulp' tasks are perfectly installed on your system.");
+            console.log(" ");
+            console.log("You can run the Gulp tasks: gulp <task_name> or gulp env-development / gulp env-build");
+            console.log(" ");
+            console.log(" ");
+            console.log(" ");
+            delete_directory("./test/dest");
+            setTimeout(function () {
+              exec("kill " + process.pid, function (err, data) { 
+            })}, 500);
+          }
+        });
+      });
+    };
+
 }());
